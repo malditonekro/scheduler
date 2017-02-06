@@ -1,0 +1,295 @@
+<p-schedule #fc
+            [events]="events" 
+            [header]="header" 
+            [eventLimit]="4" 
+            [editable]="true" 
+            [locale]="es"
+            defaultDate="{{dateNow}}" 
+            (onDayClick)="handleDayClick($event)"
+            (onEventClick)="handleEventClick($event)"
+            (onEventMouseover)="handleEventMouseOver($event)"
+            (onEventMouseout)="handleEventMouseOut($event)"
+            (onEventDragStart)="handleEventDragStart($event)"
+            (onEventDragStop)="handleEventDragStop($event)"
+            (onEventDrop)="handleEventDrop($event)"
+            (onEventResizeStart)="handleEventResizeStart($event)"
+            (onEventResizeStop)="handleEventResizeStop($event)"
+            (onEventResize)="handleEventResize($event)"
+            (onDrop)="handleOnDrop($event)"
+            (viewRender)="handleViewRender($event)"
+            >
+</p-schedule>
+<!--
+    (onEventMouseover)="overEventDetail.toggle($event)"
+    (onEventClick)="handleEventClick($event)"
+-->
+
+<p-dialog header="{{modalTitle}}" [(visible)]="dialogVisible" [responsive]="true" [resizable]="false" showEffect="fade" [modal]="true">
+    <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="event" style="max-height: 450px;" >
+        <div *ngIf="offerId">
+            <label class="col-md-12 control-label">Entrevista para el cargo</label>
+            <label class="col-md-12 control-label modalCargo" > {{offer.title}}</label>
+        </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-1">
+                    <label for="start">De * </label>
+                </div>
+                <div class="ui-grid-col-3">
+                    <!--<div class="ui-grid-col-8"><input pInputText id="start" (keyup)="globalOnChange($event)" [(ngModel)]="event.start" placeholder="{{daySelected}}"/></div>-->
+                    <div class="ui-grid-col-4">
+                        <input pInputText (keyup)="globalOnChange($event)" #hourStart id="hourStart" name="hourStart" [(ngModel)]="event.hourStart"  placeholder="00:00">                                        
+                    </div>
+                    <div class="ui-grid-col-12" *ngIf="startHourFlag!='false' && startHourFlag!=''" class="alert alert-danger">                        
+                        <div [hidden]="startHourFlag!='empty'">
+                            Ingrese un hora.
+                        </div>
+                        <div [hidden]="startHourFlag!='invalid'">
+                            Ingrese una hora válida.
+                        </div>
+                        <div [hidden]="startHourFlag!='high'">
+                            Mayor que hora de término.
+                        </div>
+                    </div>
+                </div>                
+                <!--<div *ngIf="event.allDay!==true">-->            
+                <div class="ui-grid-col-1"><label for="end">a *</label></div>
+                <div class="ui-grid-col-3">                    
+                    <!--<div class="ui-grid-col-8"><input (keyup)="globalOnChange($event)" pInputText id="end" [(ngModel)]="event.end" placeholder="{{daySelected}}"/></div>-->
+                    <div class="ui-grid-col-4">
+                        <input pInputText (keyup)="globalOnChange($event)" #hourEnd id="hourEnd" name="hourEnd" [(ngModel)]="event.hourEnd"  placeholder="00:00">
+                    </div>                
+                    <div class="ui-grid-col-12" *ngIf="endHourFlag!='false' && endHourFlag!=''" class="alert alert-danger">                        
+                        <div [hidden]="endHourFlag!='empty'">
+                            Ingrese un hora.
+                        </div>
+                        <div [hidden]="endHourFlag!='invalid'">
+                            Ingrese una hora válida.
+                        </div>
+                        <div [hidden]="endHourFlag!='lower'">
+                            Menor que hora de inicio.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="ui-grid-row">
+                <label for="allDay">
+                    <p-checkbox #allDay id="allDay" [(ngModel)]="event.allDay" binary="binary"></p-checkbox>
+                    Todo el día
+                </label>
+            </div>-->
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6">
+                    <div class="ui-grid-col-12">
+                        <label for="interviewer">Entrevistador *</label>
+                    </div>
+                    <div class="ui-grid-col-12">
+                        <div>
+                            <input pInputText #interviewer (change)="globalOnChange($event)" [(ngModel)]="event.interviewer" name="interviewer" id="interviewer">
+                        </div>
+                        <div class="ui-grid-col-12" *ngIf="interviewerFlag!='false' && interviewerFlag!=''" class="alert alert-danger">                        
+                            <div [hidden]="interviewerFlag!='empty'">
+                                Ingrese al entrevistador/a.
+                            </div>
+                            <div [hidden]="interviewerFlag!='minlength'">
+                                El tamaño mínimo es 3 caracteres.
+                            </div>
+                            <div [hidden]="interviewerFlag!='maxlength'">
+                                El tamaño máximo es 25 caracteres.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-grid-col-6">
+                    <div class="ui-grid-col-12">
+                        <label for="interviewerEmail">Email *</label>
+                    </div>
+                    <div class="ui-grid-col-12">
+                        <div class="ui-grid-col-12">
+                            <input pInputText #interviewerEmail (keyup)="globalOnChange($event)" [(ngModel)]="event.interviewerEmail" name="interviewerEmail" id="interviewerEmail">    
+                        </div>                        
+                        <div class="ui-grid-col-12" *ngIf="emailFlag!='false' && emailFlag!=''" class="alert alert-danger">                        
+                            <div [hidden]="emailFlag!='empty'">
+                                Ingrese un correo.
+                            </div>
+                            <div [hidden]="emailFlag!='format'">
+                                Ingrese un correo válido. ej: email@email.com
+                            </div>
+                            <div [hidden]="emailFlag!='domain'">
+                                Ingrese un dominio de correo válido.
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="ui-grid-row">
+                <label for="iAmInterviewer">
+                    <!-- 
+                        - Corrección, no registrar el checkbox, sólo reemplazar  el input interviewer por el usuario de la sesión actual.
+                        - Se elimina el two-way data-binding                        
+                        <p-checkbox #iAmInterviewer id="iAmInterviewer" name="iAmInterviewer" (click)="imInterviewer()" binary="binary"></p-checkbox>
+                    -->
+                    <p-checkbox #iAmInterviewer id="iAmInterviewer" [(ngModel)]="event.iAmInterviewer" (click)="imInterviewer()" binary="binary"></p-checkbox>                    
+                    Yo soy el entrevistador
+                </label>
+            </div>
+            <div class="ui-grid-row">
+                <label for="sendBackupEmail">
+                    <p-checkbox #sendBackupEmail id="sendBackupEmail" name="sendBackupEmail" [(ngModel)]="event.sendBackupEmail" binary="binary"></p-checkbox>
+                    Enviar correo de respaldo al entrevistador
+                </label>
+            </div>
+            <hr>
+            <div class="ui-grid-row">
+                <label class="control-label">Quienes asisten</label>
+            </div>
+            <div class="ui-grid-row" *ngFor="let applicant of applicants">
+                <div class="ui-grid-col-12" >
+                    <div class="ui-grid-col-3">
+                        {{applicant.personalInfo.firstName | titleCase}} {{applicant.personalInfo.lastName | titleCase}}
+                    </div>
+                    <div class="ui-grid-col-5">
+                        <a href=""><img class="external_link" src="../../assets/images/external_link.png"> Ver curriculum</a>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                    <label for="title">Título *</label>
+                </div>
+                <div class="ui-grid-col-8">
+                    <div class="ui-grid-col-12"><input (keyup)="globalOnChange($event)" #title pInputText id="title" name="title" [(ngModel)]="event.title" /></div>
+                    <div class="ui-grid-col-12" *ngIf="titleFlag!='false' && titleFlag!=''" class="alert alert-danger">                        
+                        <div [hidden]="titleFlag!='empty'">
+                            Ingrese un título para el evento.
+                        </div>
+                        <div [hidden]="titleFlag!='minlength'">
+                            El tamaño mínimo es 4 caracteres.
+                        </div>
+                        <div [hidden]="titleFlag!='maxlength'">
+                            El tamaño máximo es 25 caracteres.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4">
+                    <label for="place">Lugar *</label>
+                </div>
+                <div class="ui-grid-col-8">
+                    <div class="ui-grid-col-12"><input (keyup)="globalOnChange($event)" pInputText #place id="place" name="place" [(ngModel)]="event.place" /></div>
+                    <div class="ui-grid-col-12" *ngIf="placeFlag!='' && placeFlag!='false'" class="alert alert-danger">
+
+                        <div [hidden]="placeFlag!='empty'">
+                            Ingrese un lugar para el evento.
+                        </div>
+                        <div [hidden]="placeFlag!='minlength'">
+                            El tamaño mínimo es 4 caracteres.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="applicantComment"> Comentario para el candidato</label></div>
+                <div class="ui-grid-col-8"><textarea class="ui-grid-col-12" #applicantComment name="applicantComment" id="applicantComment" [(ngModel)]="event.applicantComment"></textarea></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="internalComment"> Comentario para uso interno</label></div>
+                <div class="ui-grid-col-8"><textarea class="ui-grid-col-12" #internalComment name="internalComment" id="internalComment" [(ngModel)]="event.internalComment"></textarea></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="file"> Archivo</label></div>
+                <p-fileUpload class="ui-grid-col-8" #file name="file[]" id="file" url="http://localhost:3000/upload" multiple="multiple"></p-fileUpload>
+            </div>
+    </div>
+    <footer>
+        <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" *ngIf="actionType==='add'">
+            <div class="ui-grid-col-10">
+                <button type="button" style="float:left" pButton icon="fa-check" [disabled]="!validForm" (click)="addEvent()" label="Agregar"></button>
+            </div>
+            <div class="ui-grid-col-2">
+                * Datos requeridos
+            </div>
+        </div>
+        <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" *ngIf="actionType==='edit'">
+            <div class="ui-grid-col-10">
+                <button type="button" style="float:left" pButton icon="fa-check" (click)="updateEvent()" label="Actualizar"></button>
+                <button type="button" style="float:left" pButton icon="fa-close" (click)="deleteEvent()" label="Eliminar"></button>
+            </div>
+            <div class="ui-grid-col-2">
+                * Datos requeridos
+            </div>
+        </div>
+        
+    </footer>
+</p-dialog>
+
+
+
+
+
+
+
+
+
+
+
+<p-overlayPanel #overEventDetail [dismissable]="true" [showCloseIcon]="true">
+    <div *ngIf="offerDescription">
+        <label class="col-md-12 control-label">Entrevista para el cargo</label>
+        <label class="col-md-12 control-label modalCargo" > {{offerDescription.jobTitle}}</label>
+    </div>
+    <div *ngIf="event">
+        <label class="col-md-12 control-label">Cuando</label>
+        <label class="col-md-12 control-label">{{event.start | date}} {{event.hourStart}} - {{event.hourEnd}} </label>
+    </div>
+    <div >
+        <label class="col-md-12 control-label">Quienes asisten</label>
+        <div class="ui-grid-row">
+            <ul>
+                <li *ngFor="let applicant of applicants" style="list-style: none;">
+                    {{applicant.personalInfo.firstName | titleCase}} {{applicant.personalInfo.lastName | titleCase}}
+                </li>
+            </ul>                  
+        </div>
+    </div>
+    <div>
+        <button #verDetalles type="button" pButton icon="fa-check" (click)="handleEventClick($event)" label="Ver detalles"></button>
+    </div>
+</p-overlayPanel>
+<button type="button" pButton icon="fa-close" (mouseenter)="overEventDetail.toggle($event)" name="btnOverlay" id="btnOverlay" label="Overlay"></button>
+<template ngbModalContainer></template>
+<!-- Template para modal de inicio-->
+<template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <div class="ui-grid-col-4">
+        <h5 class="modal-title">Asistente</h5>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="ui-grid-row">
+        <div class="ui-grid-col-2">
+            <img src="../../assets/images/chat_bubble.png" style="max-width:50px;max-height: 50px;" alt="Seleccione.">
+        </div>
+        <div class="ui-grid-col-10">
+            <p>Escoge una fecha en la agenda y haz clic en un día para agendar a los candidatos seleccionados.</p>    
+        </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+  <div>
+    <button type="button" class="btn btn-secondary" (click)="validInitModal()">Aceptar</button>
+    <button id="initCloseBtn" [hidden]="true" (click)="c('Close click')"></button>
+    <div class="ui-grid-row">
+        <label for="onInitChck">
+            <p-checkbox #onInitChck id="onInitChck" [(ngModel)]="onInitChcka" binary="binary"></p-checkbox>
+            No volver a mostrar
+        </label>
+    </div>    
+  </div>
+</template>
+<modal-component></modal-component>
+<button  id="initModalBtn" hidden="true" (click)="open(content)"></button>

@@ -1,0 +1,53 @@
+{
+  "name": "angular2app",
+  "version": "0.0.1",
+  "description": "A webpack starter for angular 2",
+  "scripts": {
+    "start": "webpack-dev-server --inline --hot --progress --port 8000",
+    "build": "webpack --config config/webpack.prod.js --progress --profile --bail",
+    "typings": "typings",
+    "postinstall": "typings install"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@angular/common": "2.3.0",
+    "@angular/compiler": "2.3.0",
+    "@angular/core": "2.3.0",
+    "@angular/forms": "2.3.0",
+    "@angular/http": "2.3.0",
+    "@angular/platform-browser": "2.3.0",
+    "@angular/platform-browser-dynamic": "2.3.0",
+    "@angular/router": "^3.2.0",
+    "@ng-bootstrap/ng-bootstrap": "^1.0.0-alpha.13",
+    "bootstrap": "^4.0.0-alpha.5",
+    "core-js": "2.3.0",
+    "font-awesome": "4.7.0",
+    "fullcalendar": "^3.1.0",
+    "jquery": "^3.0.0",
+    "moment": "^2.17.1",
+    "primeng": "^1.1.2",
+    "reflect-metadata": "^0.1.2",
+    "rxjs": "^5.0.0-beta.12",
+    "zone.js": "^0.6.26"
+  },
+  "devDependencies": {
+    "@types/es6-shim": "^0.31.32",
+    "@types/node": "^6.0.48",
+    "css-loader": "latest",
+    "extract-text-webpack-plugin": "latest",
+    "file-loader": "latest",
+    "html-loader": "latest",
+    "html-webpack-plugin": "latest",
+    "null-loader": "latest",
+    "raw-loader": "latest",
+    "style-loader": "latest",
+    "ts-loader": "latest",
+    "typescript": "latest",
+    "typings": "latest",
+    "webpack": "1.12.9",
+    "webpack-cleanup-plugin": "latest",
+    "webpack-dev-server": "latest",
+    "webpack-livereload-plugin": "^0.9.0",
+    "webpack-merge": "latest"
+  }
+}
